@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* ===== Modern Dashboard Styles ===== */
 
   * {
@@ -16,4 +17,24 @@
         .focus-ring-purple {
             outline: none;
             box-shadow: 0 0 0 3px rgba(124, 27, 207, 0.5); /* Custom ring color */
+=======
+/* ===== Modern Dashboard Styles ===== */
+
+  * {
+            font-family: "Inter", sans-serif;
+            background-color: #f3f4f6;
+        }
+        .bg-purple-main {
+            background-color: #7C1BCF;
+        }
+        .text-purple-main {
+            color: #7C1BCF;
+        }
+        .border-purple-main {
+            border-color: #7C1BCF;
+        }
+        .focus-ring-purple {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(124, 27, 207, 0.5); /* Custom ring color */
+>>>>>>> 6c43e4c3882f0ded7541d2e70893c9d014912895
         }

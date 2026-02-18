@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Meeting-specific styles */
 *{
             font-family: 'Inter', sans-serif;
@@ -39,4 +40,47 @@
             #video-grid {
                 grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
             }
+=======
+/* Meeting-specific styles */
+*{
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .video-player {
+            width: 100%;
+            height: 250px; /* Adjusted for better responsiveness */
+            background-color: #2c3e50; /* Darker background for video areas */
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex; /* Use flex to center video elements */
+            justify-content: center;
+            align-items: center;
+            color: #ecf0f1;
+            font-size: 1.2em;
+        }
+        .video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures video fills the container */
+            border-radius: 12px;
+        }
+        /* Responsive grid for videos */
+        #video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        @media (min-width: 768px) {
+            #video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+        @media (min-width: 1024px) {
+            #video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            }
+>>>>>>> 6c43e4c3882f0ded7541d2e70893c9d014912895
         }
