@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Jireh - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f3f4f6;
+        }
+        .bg-purple-main {
+            background-color: #7C1BCF;
+        }
+        .text-purple-main {
+            color: #7C1BCF;
+        }
+        .border-purple-main {
+            border-color: #7C1BCF;
+        }
+        .focus-ring-purple {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(124, 27, 207, 0.5); /* Custom ring color */
+        }
+        /* Style for date/time input icon */
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(40%) sepia(80%) saturate(2000%) hue-rotate(240deg) brightness(90%) contrast(80%); /* Purple tint */
+            font-size: 1.25rem; /* Larger icon */
+            padding: 0.25rem; /* Add some padding */
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center min-h-screen bg-gray-100 p-6">
+    <div class="w-full max-w-4xl bg-white p-8 rounded-lg shadow-xl text-center">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-purple-main">Welcome to Project Jireh!</h1>
+            <div class="flex items-center space-x-4">
+                <span id="displayUserName" class="text-gray-700 font-semibold text-lg"></span>
+                <button id="signOutBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-200">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                </button>
+            </div>
+        </div>
+
+        <p class="text-gray-700 mb-8">Ready to connect? Create a new meeting or join an existing one.</p>
+
+        <!-- Initial Buttons Container -->
+        <div id="initialButtons" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <button id="showCreateMeetingFormBtn" class="bg-purple-main text-white px-6 py-4 rounded-lg text-xl font-semibold hover:bg-purple-800 transition duration-200 shadow-md">
+                <i class="fas fa-plus-circle mr-3"></i> Create a New Meeting
+            </button>
+            <button id="showJoinMeetingFormBtn" class="bg-blue-600 text-white px-6 py-4 rounded-lg text-xl font-semibold hover:bg-blue-700 transition duration-200 shadow-md">
+                <i class="fas fa-sign-in-alt mr-3"></i> Join an Existing Meeting
+            </button>
+        </div>
+
+        <!-- Create Meeting Section (Hidden by default) -->
+        <div id="createMeetingSection" class="hidden mt-8">
+            <div class="bg-purple-50 p-6 rounded-lg shadow-md border border-purple-main">
+                <h2 class="text-2xl font-semibold mb-4 text-purple-main">Create a New Meeting</h2>
+                <div class="space-y-4 text-left">
+                    <div>
+                        <label for="meetingTopic" class="block text-gray-700 text-sm font-bold mb-2">Topic:</label>
+                        <input type="text" id="meetingTopic" placeholder="e.g., Daily Standup, Team Sync" required
+                               class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:focus-ring-purple">
+                    </div>
+                    <div>
+                        <label for="meetingWhen" class="block text-gray-700 text-sm font-bold mb-2">When:</label>
+                        <input type="datetime-local" id="meetingWhen"
+                               class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:focus-ring-purple">
+                    </div>
+                    <div>
+                        <label for="meetingPasscode" class="block text-gray-700 text-sm font-bold mb-2">Passcode (Optional):</label>
+                        <input type="text" id="meetingPasscode" placeholder="Leave empty for no passcode"
+                               class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:focus-ring-purple">
+                    </div>
+                    <button id="createMeetingBtn"
+                            class="bg-purple-main text-white px-5 py-2 rounded-lg font-semibold hover:bg-purple-800 transition duration-200 w-full">
+                        <i class="fas fa-plus-circle mr-2"></i>Create Meeting
+                    </button>
+                </div>
+
+                <div id="meetingDetails" class="mt-6 p-4 bg-purple-100 rounded-lg hidden text-left">
+                    <p class="font-semibold text-purple-800 mb-2">Your Meeting Details:</p>
+                    <p><strong>Meeting ID:</strong> <span id="displayMeetingId" class="font-mono text-purple-900"></span></p>
+                    <p><strong>Passcode:</strong> <span id="displayPasscode" class="font-mono text-purple-900"></span></p>
+                    <p class="mt-2"><strong>Join Link:</strong> <a id="displayMeetingLink" href="#" target="_blank" class="text-blue-600 hover:underline break-all"></a></p>
+                    <button id="copyLinkBtn" class="mt-4 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition duration-200">
+                        <i class="fas fa-copy mr-2"></i>Copy Link
+                    </button>
+                    <button id="startNewMeetingBtn" class="mt-4 ml-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200">
+                        <i class="fas fa-video mr-2"></i>Start Meeting
+                    </button>
+                </div>
+                <button id="backToOptionsFromCreate" class="mt-6 bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 transition duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Options
+                </button>
+            </div>
+        </div>
+
+        <!-- Join Meeting Section (Hidden by default) -->
+        <div id="joinMeetingSection" class="hidden mt-8">
+            <div class="bg-blue-50 p-6 rounded-lg shadow-md border border-blue-400">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-800">Join an Existing Meeting</h2>
+                <div class="space-y-4 text-left">
+                    <div>
+                        <label for="joinMeetingId" class="block text-gray-700 text-sm font-bold mb-2">Meeting ID:</label>
+                        <input type="text" id="joinMeetingId" placeholder="Enter Meeting ID"
+                               class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:focus-ring-purple">
+                    </div>
+                    <div>
+                        <label for="joinPasscode" class="block text-gray-700 text-sm font-bold mb-2">Passcode (if any):</label>
+                        <input type="text" id="joinPasscode" placeholder="Enter Passcode"
+                               class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:focus-ring-purple">
+                    </div>
+                    <button id="joinMeetingBtn"
+                            class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 w-full">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Join Meeting
+                    </button>
+                </div>
+                <button id="backToOptionsFromJoin" class="mt-6 bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400 transition duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Options
+                </button>
+            </div>
+        </div>
+
+        <p id="dashboard-error-message" class="text-red-500 mt-6 text-sm hidden"></p>
+    </div>
+
+    <!-- Firebase SDK (Auth) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script>
+        // Your Firebase Web App configuration (same as index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCleL0m3xmEG2-zBOboRqjER9gZH3OVDbk",
+            authDomain: "jireh-908c7.firebaseapp.com",
+            projectId: "jireh-908c7",
+            storageBucket: "jireh-908c7.firebasestorage.app",
+            messagingSenderId: "Y651054138658",
+            appId: "1:651054138658:web:7103f1244b15412cec517b"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Get elements for the new toggle functionality
+         const initialButtonsContainer = document.getElementById('initialButtons');
+    const showCreateMeetingFormBtn = document.getElementById('showCreateMeetingFormBtn');
+    const showJoinMeetingFormBtn = document.getElementById('showJoinMeetingFormBtn');
+    const createMeetingSection = document.getElementById('createMeetingSection');
+    const joinMeetingSection = document.getElementById('joinMeetingSection');
+    const backToOptionsFromCreateBtn = document.getElementById('backToOptionsFromCreate');
+    const backToOptionsFromJoinBtn = document.getElementById('backToOptionsFromJoin');
+    const displayUserName = document.getElementById('displayUserName');
+
+    const signOutBtn = document.getElementById('signOutBtn');
+    const createMeetingBtn = document.getElementById('createMeetingBtn');
+    const joinMeetingBtn = document.getElementById('joinMeetingBtn');
+
+    const meetingTopicInput = document.getElementById('meetingTopic');
+    const meetingWhenInput = document.getElementById('meetingWhen');
+    const meetingPasscodeInput = document.getElementById('meetingPasscode');
+    const meetingDetailsDiv = document.getElementById('meetingDetails');
+    const displayMeetingId = document.getElementById('displayMeetingId');
+    const displayPasscode = document.getElementById('displayPasscode');
+    const displayMeetingLink = document.getElementById('displayMeetingLink');
+
+    const joinMeetingIdInput = document.getElementById('joinMeetingId');
+    const joinPasscodeInput = document.getElementById('joinPasscode');
+    const dashboardErrorMessage = document.getElementById('dashboard-error-message');
+
+    function showInitialOptions() {
+        initialButtonsContainer.classList.remove('hidden');
+        createMeetingSection.classList.add('hidden');
+        joinMeetingSection.classList.add('hidden');
+        dashboardErrorMessage.classList.add('hidden');
+    }
+
+    showCreateMeetingFormBtn.addEventListener('click', () => {
+        initialButtonsContainer.classList.add('hidden');
+        createMeetingSection.classList.remove('hidden');
+        joinMeetingSection.classList.add('hidden');
+        dashboardErrorMessage.classList.add('hidden');
+        meetingDetailsDiv.classList.add('hidden');
+    });
+
+    showJoinMeetingFormBtn.addEventListener('click', () => {
+        initialButtonsContainer.classList.add('hidden');
+        joinMeetingSection.classList.remove('hidden');
+        createMeetingSection.classList.add('hidden');
+        dashboardErrorMessage.classList.add('hidden');
+    });
+
+    backToOptionsFromCreateBtn.addEventListener('click', showInitialOptions);
+    backToOptionsFromJoinBtn.addEventListener('click', showInitialOptions);
+
+    /* =============================
+       CREATE MEETING (UNCHANGED)
+    ============================= */
+
+    createMeetingBtn.addEventListener('click', async () => {
+        const topic = meetingTopicInput.value.trim();
+        const when = meetingWhenInput.value || "Now";
+        const passcode = meetingPasscodeInput.value.trim();
+
+        if (!topic) {
+            dashboardErrorMessage.textContent = "Please enter a Topic.";
+            dashboardErrorMessage.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            const response = await fetch('/create-meeting', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, when, passcode })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                dashboardErrorMessage.textContent = data.message || "Failed to create meeting.";
+                dashboardErrorMessage.classList.remove('hidden');
+                return;
+            }
+
+            displayMeetingId.textContent = data.meetingId;
+            displayPasscode.textContent = data.passcode || 'N/A';
+            displayMeetingLink.href = data.meetingLink;
+            displayMeetingLink.textContent = data.meetingLink;
+
+            meetingDetailsDiv.classList.remove('hidden');
+            dashboardErrorMessage.classList.add('hidden');
+
+        } catch (err) {
+            dashboardErrorMessage.textContent = "Error creating meeting.";
+            dashboardErrorMessage.classList.remove('hidden');
+        }
+    });
+
+    /* =========================================
+       ✅ FIXED JOIN MEETING WITH VALIDATION
+    ========================================= */
+
+    joinMeetingBtn.addEventListener('click', async () => {
+
+    const meetingId = joinMeetingIdInput.value.trim();
+    const passcode = joinPasscodeInput.value.trim();
+    const userName = localStorage.getItem('userName') || 'Guest';
+
+    if (!meetingId) {
+        alert("Meeting does not exists ! Please check your meeting ID & enter again");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/meetings/${meetingId}/validate`);
+
+        if (!response.ok) {
+            alert("Meeting does not exists ! Please check your meeting ID & enter again");
+            return;
+        }
+
+        // Only redirect if valid
+        window.location.href =
+            `/prejoin.html?id=${meetingId}&passcode=${passcode}&displayName=${encodeURIComponent(userName)}`;
+
+    } catch (err) {
+        alert("Meeting does not exists ! Please check your meeting ID & enter again");
+    }
+
+});
+
+    </script>
+</body>
+</html>

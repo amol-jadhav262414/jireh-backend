@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Join Meeting - Project Jireh</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+
+<div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl text-center">
+    <h1 class="text-3xl font-bold mb-6 text-purple-main">Prepare to Join</h1>
+    <p class="text-gray-600 mb-8">Enter your display name and check your audio/video before entering the meeting.</p>
+
+    <div class="space-y-6">
+
+        <div class="text-left">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Your Display Name:</label>
+            <input type="text" id="displayNameInput"
+                   class="shadow border rounded-lg w-full py-2 px-3">
+            <p id="nameError" class="text-red-500 text-sm mt-1 hidden">Please enter a display name.</p>
+        </div>
+
+        <div id="local-video-preview" class="mx-auto bg-gray-800 h-72 rounded-lg flex items-center justify-center relative">
+            <div id="video-feed" class="w-full h-full"></div>
+            <p id="preview-placeholder" class="absolute text-white">Camera Off</p>
+        </div>
+
+        <div class="flex justify-center space-x-6 mt-4">
+            <button id="toggle-mic-button" class="p-3 bg-gray-700 rounded-full text-white">Mic</button>
+            <button id="toggle-camera-button" class="p-3 bg-gray-700 rounded-full text-white">Camera</button>
+        </div>
+
+        <button id="joinMeetingPrejoinBtn"
+                class="mt-8 bg-purple-600 text-white px-8 py-3 rounded-lg text-xl font-semibold w-full">
+            Join Meeting Now
+        </button>
+
+    </div>
+
+    <p id="prejoin-error-message" class="text-red-500 mt-6 text-sm hidden"></p>
+</div>
+
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+
+<script>
+let localAudioTrack;
+let localVideoTrack;
+
+const displayNameInput = document.getElementById('displayNameInput');
+const joinMeetingPrejoinBtn = document.getElementById('joinMeetingPrejoinBtn');
+const nameError = document.getElementById('nameError');
+const prejoinErrorMessage = document.getElementById('prejoin-error-message');
+const videoFeed = document.getElementById('video-feed');
+const previewPlaceholder = document.getElementById('preview-placeholder');
+
+const toggleMicButton = document.getElementById('toggle-mic-button');
+const toggleCameraButton = document.getElementById('toggle-camera-button');
+
+function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+const meetingId = getQueryParam('id');
+const passcode = getQueryParam('passcode');
+
+// Preview setup
+async function initPreview() {
+    try {
+        localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+    } catch (e) {
+        console.warn("Mic not available");
+    }
+
+    try {
+        localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+        localVideoTrack.play(videoFeed);
+        previewPlaceholder.classList.add('hidden');
+    } catch (e) {
+        console.warn("Camera not available");
+    }
+}
+
+async function toggleMic() {
+    if (!localAudioTrack) return;
+    await localAudioTrack.setEnabled(!localAudioTrack.enabled);
+}
+
+async function toggleCamera() {
+    if (!localVideoTrack) return;
+    await localVideoTrack.setEnabled(!localVideoTrack.enabled);
+
+    if (localVideoTrack.enabled) {
+        previewPlaceholder.classList.add('hidden');
+        localVideoTrack.play(videoFeed);
+    } else {
+        previewPlaceholder.classList.remove('hidden');
+        localVideoTrack.stop();
+    }
+}
+
+// Final Join Button
+joinMeetingPrejoinBtn.addEventListener('click', () => {
+
+    const displayName = displayNameInput.value.trim();
+
+    if (!displayName) {
+        nameError.classList.remove('hidden');
+        return;
+    }
+
+    nameError.classList.add('hidden');
+
+    if (!meetingId) {
+        prejoinErrorMessage.textContent = "Meeting ID missing.";
+        prejoinErrorMessage.classList.remove('hidden');
+        return;
+    }
+
+    let redirectUrl =
+        `/meeting?id=${meetingId}&passcode=${passcode || ''}&displayName=${encodeURIComponent(displayName)}`;
+
+    if (localAudioTrack && !localAudioTrack.enabled) {
+        redirectUrl += '&micOff=true';
+    }
+
+    if (localVideoTrack && !localVideoTrack.enabled) {
+        redirectUrl += '&camOff=true';
+    }
+
+    if (localAudioTrack) localAudioTrack.close();
+    if (localVideoTrack) localVideoTrack.close();
+
+    window.location.href = redirectUrl;
+});
+
+window.onload = async () => {
+    const storedName = localStorage.getItem('userName');
+    if (storedName) displayNameInput.value = storedName;
+
+    await initPreview();
+    toggleMicButton.addEventListener('click', toggleMic);
+    toggleCameraButton.addEventListener('click', toggleCamera);
+};
+</script>
+
+</body>
+</html>
